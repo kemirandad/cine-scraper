@@ -6,14 +6,14 @@ import scrapy
 # Summary = //div[@class="Description"]/p/text()
 # Director = //span[@class="color-w"]/text()
 # Genre = //li[@class="AAIco-adjust"]/a/text()
-# Portrait = //div[@class="Image"]/figure/img/@src
+# Portrait = //div[@class="Image"]/figure/img/@data-src
 
 class CineSpider(scrapy.Spider):
     name = 'cine'
     start_urls = [
         'https://cuevana3.io/peliculas'
     ]
-    count = 0
+    count = 1
 
     custom_settings = {
         'FEED_URI' : 'cine.json',
@@ -55,9 +55,7 @@ class CineSpider(scrapy.Spider):
         next_page_button = response.xpath(
             '//div[@class="nav-links"]/a[starts-with(@class, "next")]/@href').get()
 
-        top_pages = links[:top]
-
-        if next_page_button and (self.count < top):
+        if next_page_button and (self.count < 5):
             self.count += 1
             yield response.follow(next_page_button, 
                                     callback=self.parse_whole_links,
@@ -81,7 +79,7 @@ class CineSpider(scrapy.Spider):
         summary = response.xpath('//div[@class="Description"]/p/text()').get()
         director = response.xpath('//span[@class="color-w"]/text()').get()
         genre = response.xpath('//li[@class="AAIco-adjust"]/a/text()').getall()
-        img = response.xpath('//div[@class="Image"]/figure/img/@src').get()
+        img = response.xpath('//div[@class="Image"]/figure/img/@data-src').get()
 
         return {
             'title': title,
